@@ -28,27 +28,60 @@ def calc_age(naissance, fait):
     nbr_ans = 0
     nbr_mois = 0
     nbr_jours = 0
+
     try:
         workdate = datetime.date(naissance.year, naissance.month, naissance.day)
+        saved_day_of_month = workdate.day
 
+        # Count number of full years
         while workdate.replace(year=workdate.year + 1) <= fait:
             nbr_ans += 1
             workdate = workdate.replace(year=workdate.year + 1)
 
+        # Count number of months
         while workdate < fait:
             if workdate.month < 12:
-                if workdate.replace(month=workdate.month + 1) <= fait:
-                    nbr_mois += 1
-                    workdate = workdate.replace(month=workdate.month + 1)
-                else:
-                    break
-            else:
+                if workdate.month + 1 in [3, 5, 7, 8, 10, 12]:  # if next month has 31 days
+                    if workdate.replace(month=workdate.month + 1) <= fait:
+                        nbr_mois += 1
+                        workdate = workdate.replace(month=workdate.month + 1, day=saved_day_of_month)
+                    else:
+                        break
+                elif workdate.month + 1 in [4, 6, 9, 11]:  # if next month has 30 days
+                    if saved_day_of_month > 30:  # Use day 30 to avoid invalid date like April 31
+                        if workdate.replace(month=workdate.month + 1, day=30) <= fait:
+                            nbr_mois += 1
+                            workdate = workdate.replace(month=workdate.month + 1, day=30)
+                        else:
+                            break
+                    else:  # Day 1-30 will not cause and invalid date
+                        if workdate.replace(month=workdate.month + 1, day=saved_day_of_month) <= fait:
+                            nbr_mois += 1
+                            workdate = workdate.replace(month=workdate.month + 1, day=saved_day_of_month)
+                        else:
+                            break
+                else:  # Next month is February, maybe a leap year
+                    nbr_days_in_feb = 29 if is_bissextile(workdate.year) else 28
+                    if saved_day_of_month > nbr_days_in_feb:
+                        if workdate.replace(month=workdate.month + 1, day=nbr_days_in_feb) <= fait:
+                            nbr_mois += 1
+                            workdate = workdate.replace(month=workdate.month + 1, day=nbr_days_in_feb)
+                        else:
+                            break
+                    else:
+                        if workdate.replace(month=workdate.month + 1, day=saved_day_of_month) <= fait:
+                            nbr_mois += 1
+                            workdate = workdate.replace(month=workdate.month + 1, day=saved_day_of_month)
+                        else:
+                            break
+            else:  # Next month is January, Dec and Jan have 31 days, no special hangling for the day of month
                 if workdate.replace(year=workdate.year + 1, month=1) <= fait:
                     nbr_mois += 1
                     workdate = workdate.replace(year=workdate.year + 1, month=1)
                 else:
                     break
 
+        # Count number of days
         while workdate < fait:
             if workdate.month in [1, 3, 5, 7, 8, 10, 12]:  # Months with 31 days
                 if workdate.day < 31:
@@ -91,7 +124,8 @@ def calc_age(naissance, fait):
                     workdate = workdate.replace(month=3, day=1)
                     continue
     except ValueError:
-        print("WTF!")
+        print("WTF, Value error ie, got an invalid date while processing.")
+
     return nbr_ans, nbr_mois, nbr_jours
 
 
@@ -99,13 +133,13 @@ def main():
     global date_naissance
     global date_deces
     try:
-        date_naissance = datetime.date(1900, 1, 27)
+        date_naissance = datetime.date(1825, 12, 31)
     except ValueError:
         print("La date de naissance n'est pas valide.")
         exit(4)
 
     try:
-        date_deces = datetime.date(1901, 4, 15)
+        date_deces = datetime.date(1826, 3, 26)
     except ValueError:
         print("La date de décès n'est pas valide.")
         exit(4)
