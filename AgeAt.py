@@ -129,6 +129,54 @@ def calc_age(naissance, fait):
     return nbr_ans, nbr_mois, nbr_jours
 
 
+def date_minus_ymd(deces, nbr_ans, nbr_mois, nbr_jours):
+    try:
+        assert nbr_ans >= 0
+        assert 0 <= nbr_mois < 12
+        assert 0 <= nbr_jours < 31
+    except AssertionError:
+        print("Invalid number of years, months or days")
+        return deces
+
+    result_date = datetime.date(deces.year, deces.month, deces.day)
+    saved_day_of_month = deces.day
+
+    # Deduct the number of full years
+    if not is_bissextile(result_date.year - nbr_ans) and result_date.month == 2 and result_date.day == 29:
+        result_date = result_date.replace(year=result_date.year - nbr_ans, day=28)
+    else:
+        result_date = result_date.replace(year=result_date.year - nbr_ans, day=saved_day_of_month)
+
+    # Deduct the number of months. This may fall in the previous year
+    if nbr_mois < result_date.month:
+        result_month = result_date.month - nbr_mois
+        year_to_sub = 0
+    else:
+        result_month = 12 - (nbr_mois - result_date.month)
+        year_to_sub = 1
+
+    if result_month in [1, 3, 5, 7, 8, 10, 12]:  # Months with 31 days
+        result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month,
+                                          day=saved_day_of_month)
+    elif result_month in [4, 6, 9, 11]:  # Months with 30 days
+        if saved_day_of_month <= 30:
+            result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month,
+                                          day=saved_day_of_month)
+        else:
+            result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month, day=30)
+    else:  # Month is February
+        nbr_of_days_in_feb = 29 if is_bissextile(result_date.year - year_to_sub) else 28
+        if saved_day_of_month <= nbr_of_days_in_feb:
+            result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month,
+                                              day=saved_day_of_month)
+        else:
+            result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month, day=28)
+
+    # Deduct the number of days, which could subtract a month which may subtract a year
+
+    return result_date
+
+
 def main():
     global date_naissance
     global date_deces
@@ -139,7 +187,7 @@ def main():
         exit(4)
 
     try:
-        date_deces = datetime.date(1826, 3, 26)
+        date_deces = datetime.date(1828, 2, 29)
     except ValueError:
         print("La date de décès n'est pas valide.")
         exit(4)
@@ -152,6 +200,9 @@ def main():
     print("Nombre d'années: " + str(ans))
     print("Nombre de mois:  " + str(mois))
     print("Nombre de jours: " + str(jours))
+
+    date_naissance = date_minus_ymd(date_deces, 1, 11, 0)
+    print(date_naissance)
 
 if __name__ == '__main__':
     main()
