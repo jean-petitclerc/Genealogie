@@ -161,7 +161,7 @@ def date_minus_ymd(deces, nbr_ans, nbr_mois, nbr_jours):
     elif result_month in [4, 6, 9, 11]:  # Months with 30 days
         if saved_day_of_month <= 30:
             result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month,
-                                          day=saved_day_of_month)
+                                              day=saved_day_of_month)
         else:
             result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month, day=30)
     else:  # Month is February
@@ -173,7 +173,19 @@ def date_minus_ymd(deces, nbr_ans, nbr_mois, nbr_jours):
             result_date = result_date.replace(year=result_date.year - year_to_sub, month=result_month, day=28)
 
     # Deduct the number of days, which could subtract a month which may subtract a year
-
+    if nbr_jours < saved_day_of_month:
+        result_date = result_date.replace(day=result_date.day - nbr_jours)
+    else:
+        if result_date.month == 1:
+            result_date = result_date.replace(year=result_date.year - 1, month=12,
+                                              day=31 - (nbr_jours - result_date.day))
+        elif result_date.month - 1 in [1, 3, 5, 7, 8, 10]:  # Other months with 31 days
+            result_date = result_date.replace(month=result_date.month - 1, day=31 - (nbr_jours - result_date.day))
+        elif result_date.month - 1 in [4, 6, 9, 11]:  # Previous month has 30 days
+            result_date = result_date.replace(month=result_date.month - 1, day=30 - (nbr_jours - result_date.day))
+        else:  # Previous month is February
+            nbr_of_days = 29 if is_bissextile(result_date.year) else 28
+            result_date = result_date.replace(month=1, day=nbr_of_days - (nbr_jours - result_date.day))
     return result_date
 
 
@@ -182,12 +194,14 @@ def main():
     global date_deces
     try:
         date_naissance = datetime.date(1825, 12, 31)
+        print("Date de naissance: " + str(date_naissance))
     except ValueError:
         print("La date de naissance n'est pas valide.")
         exit(4)
 
     try:
-        date_deces = datetime.date(1828, 2, 29)
+        date_deces = datetime.date(1875, 2, 15)
+        print("Date de deces....: " + str(date_deces))
     except ValueError:
         print("La date de décès n'est pas valide.")
         exit(4)
@@ -197,12 +211,10 @@ def main():
         exit(4)
 
     (ans, mois, jours) = calc_age(date_naissance, date_deces)
-    print("Nombre d'années: " + str(ans))
-    print("Nombre de mois:  " + str(mois))
-    print("Nombre de jours: " + str(jours))
+    print("L'age au deces...: "  + str(ans) + " ans, " + str(mois) + " mois et " + str(jours) + " jour(s).")
 
-    date_naissance = date_minus_ymd(date_deces, 1, 11, 0)
-    print(date_naissance)
+    date_naissance = date_minus_ymd(date_deces, 49, 1, 15)
+    print("Validation.......: " + str(date_naissance))
 
 if __name__ == '__main__':
     main()
