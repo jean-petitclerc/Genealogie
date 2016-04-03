@@ -213,7 +213,7 @@ def main():
     (ans, mois, jours) = calc_age(date_naissance, date_deces)
     print("L'age au deces...: "  + str(ans) + " ans, " + str(mois) + " mois et " + str(jours) + " jour(s).")
 
-    date_naissance = date_minus_ymd(date_deces, 49, 1, 15)
+    date_naissance = date_minus_ymd(date_deces, ans, mois, jours)
     print("Validation.......: " + str(date_naissance))
 
 if __name__ == '__main__':
