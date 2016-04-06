@@ -1,2 +1,12 @@
-<h1>Age à la date de décès</h1>
-<p>La personne est décédée à {{ years }} année(s) {{ months }} mois et {{ days }} jour(s).</p>
+{% extends "base.html" %}
+
+{% block title %}Age Au Décès{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Âge Au Décès</h1>
+        <p>La personne est décédée à {{ years }} année(s) {{ months }} mois et {{ days }} jour(s).</p>
+    </div>
+</div>
+{% endblock %}

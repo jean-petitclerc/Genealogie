@@ -1,2 +1,15 @@
-<h1>Calcule l'âge à la date du décès</h1>
+{% extends "base.html" %}
+
+{% block title %}Généalogie{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('calc_age_at') }}">Calcule l'âge au décès</a></li>
+            <li><a href="/">Autre fonction</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
 
