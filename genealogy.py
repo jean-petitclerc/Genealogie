@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, session, redirect, url_for
 from flask_script import Manager
 from flask_bootstrap import Bootstrap
 from flask_wtf import Form
@@ -22,6 +22,9 @@ class AgeAtForm(Form):
 
 @app.route('/')
 def index():
+    session['years'] = None
+    session['date_naissance_y'] = None
+    session['date_deces_y'] = None
     return render_template('index.html')
 
 
@@ -34,12 +37,32 @@ def calc_age_at():
     if form.validate_on_submit():
         date_naissance = form.date_naissance.data
         date_deces = form.date_deces.data
+        session['date_naissance_y'] = date_naissance.year
+        session['date_naissance_m'] = date_naissance.month
+        session['date_naissance_d'] = date_naissance.day
+        session['date_deces_y'] = date_deces.year
+        session['date_deces_m'] = date_deces.month
+        session['date_deces_d'] = date_deces.day
         if date_deces < date_naissance:
             flash("La date du décès doit être après la date de naissance.")
         else:
             (years, months, days) = calc_age(date_naissance, date_deces)
-        return render_template('ageat.html', form=form, years=years, months=months, days=days)
-    return render_template('ageat.html', form=form, years=None)
+            session['years'] = years
+            session['months'] = months
+            session['days'] = days
+        return redirect(url_for('calc_age_at'))
+    if session.get('date_naissance_y'):
+        yr = int(session['date_naissance_y'])
+        mn = int(session['date_naissance_m'])
+        dy = int(session['date_naissance_d'])
+        form.date_naissance.data = date(yr, mn, dy)
+    if session.get('date_deces_y'):
+        yr = int(session['date_deces_y'])
+        mn = int(session['date_deces_m'])
+        dy = int(session['date_deces_d'])
+        form.date_deces.data = date(yr, mn, dy)
+    return render_template('ageat.html', form=form,
+                           years=session.get('years'), months=session.get('months'), days=session.get('days'))
 
 
 @app.errorhandler(404)
