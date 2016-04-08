@@ -10,11 +10,8 @@
         <h1>Âge Au Décès</h1>
         {{ wtf.quick_form(form) }}
         {% if years %}
-            {% if years == -1 %}
-            <p>La date de décès doit être après la date de naissance</p>
-            {% else %}
+            <br>
             <p>La personne est décédée à {{ years }} année(s) {{ months }} mois et {{ days }} jour(s).</p>
-            {% endif %}
         {% endif %}
     </div>
 </div>

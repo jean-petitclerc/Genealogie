@@ -23,9 +23,6 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block content %}
 <div>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -37,7 +34,9 @@
         {% endif %}
     {% endwith %}
 </div>
+{% endblock %}
 
+{% block content %}
 <div class="container">
     {% block page_content %}{% endblock %}
 </div>

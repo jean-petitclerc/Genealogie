@@ -35,9 +35,7 @@ def calc_age_at():
         date_naissance = form.date_naissance.data
         date_deces = form.date_deces.data
         if date_deces < date_naissance:
-            print("Dates décès avant date de naissance.")
             flash("La date du décès doit être après la date de naissance.")
-            years = -1
         else:
             (years, months, days) = calc_age(date_naissance, date_deces)
         return render_template('ageat.html', form=form, years=years, months=months, days=days)
