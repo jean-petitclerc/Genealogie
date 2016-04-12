@@ -2,16 +2,16 @@
 
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}Age Au Décès{% endblock %}
+{% block title %}Âge à l'évènement{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h1>Âge Au Décès</h1>
+        <h1>Âge à l'évènement</h1>
         {{ wtf.quick_form(form) }}
-        {% if years %}
+        {% if session['age_is_calculated'] %}
             <br>
-            <p>La personne est décédée à {{ years }} année(s) {{ months }} mois et {{ days }} jour(s).</p>
+            <p>L'âge de la personne est {{ years }} année(s) {{ months }} mois et {{ days }} jour(s).</p>
         {% endif %}
     </div>
 </div>

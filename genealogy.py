@@ -15,52 +15,51 @@ bootstrap = Bootstrap(app)
 
 
 class AgeAtForm(Form):
-    date_naissance = DateField('Date de naissance', format='%Y-%m-%d', validators=[DataRequired()])
-    date_deces = DateField('Date du décès', validators=[DataRequired()])
+    date_naissance = DateField("Date de naissance (yyyy-mm-dd)", format='%Y-%m-%d', validators=[DataRequired()])
+    date_evenement = DateField("Date de l'évènement", validators=[DataRequired()])
     submit = SubmitField('Calculer')
 
 
 @app.route('/')
 def index():
-    session['years'] = None
+    session['age_is_calculated'] = False
     session['date_naissance_y'] = None
-    session['date_deces_y'] = None
+    session['date_evenement_y'] = None
     return render_template('index.html')
 
 
 @app.route('/AgeAt', methods=['GET', 'POST'])
 def calc_age_at():
-    years = None
-    months = None
-    days = None
     form = AgeAtForm()
     if form.validate_on_submit():
         date_naissance = form.date_naissance.data
-        date_deces = form.date_deces.data
+        date_evenement = form.date_evenement.data
         session['date_naissance_y'] = date_naissance.year
         session['date_naissance_m'] = date_naissance.month
         session['date_naissance_d'] = date_naissance.day
-        session['date_deces_y'] = date_deces.year
-        session['date_deces_m'] = date_deces.month
-        session['date_deces_d'] = date_deces.day
-        if date_deces < date_naissance:
-            flash("La date du décès doit être après la date de naissance.")
+        session['date_evenement_y'] = date_evenement.year
+        session['date_evenement_m'] = date_evenement.month
+        session['date_evenement_d'] = date_evenement.day
+        if date_evenement < date_naissance:
+            flash("La date de l'évènement doit être après la date de naissance.")
+            session['age_is_calculated'] = False
         else:
-            (years, months, days) = calc_age(date_naissance, date_deces)
+            (years, months, days) = calc_age(date_naissance, date_evenement)
+            session['age_is_calculated'] = True
             session['years'] = years
             session['months'] = months
             session['days'] = days
-        return redirect(url_for('calc_age_at'))
+            return redirect(url_for('calc_age_at'))
     if session.get('date_naissance_y'):
         yr = int(session['date_naissance_y'])
         mn = int(session['date_naissance_m'])
         dy = int(session['date_naissance_d'])
         form.date_naissance.data = date(yr, mn, dy)
-    if session.get('date_deces_y'):
-        yr = int(session['date_deces_y'])
-        mn = int(session['date_deces_m'])
-        dy = int(session['date_deces_d'])
-        form.date_deces.data = date(yr, mn, dy)
+    if session.get('date_evenement_y'):
+        yr = int(session['date_evenement_y'])
+        mn = int(session['date_evenement_m'])
+        dy = int(session['date_evenement_d'])
+        form.date_evenement.data = date(yr, mn, dy)
     return render_template('ageat.html', form=form,
                            years=session.get('years'), months=session.get('months'), days=session.get('days'))
 
