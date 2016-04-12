@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Calcul de la date de naissance{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Calcul de la date de naissance</h1>
+        {{ wtf.quick_form(form) }}
+        {% if session['reverse_is_calculated'] %}
+            <br>
+            <p>La date de naissance est {{ '%04d' % naissance_y }}-{{ '%02d' % naissance_m }}-{{ '%02d' % naissance_d }}.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
